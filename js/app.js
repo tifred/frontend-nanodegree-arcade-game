@@ -1,6 +1,4 @@
-/*
-
-Notes on x and y coordinates for game:
+/* Notes on x and y coordinates for game
 
 Canvas is 505 wide.
 5 columns total, so each column is 101 wide.
@@ -36,6 +34,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+
+/* Enemy */
+
+
 // Function to create new instances of Enemy object.
 var Enemy = function() {
 
@@ -70,12 +72,16 @@ Enemy.prototype.update = function(dt) {
   // if the enemy enters same square as player, reset the player position.
   if ((this.x >= player.x && this.x <= player.x + 101) && this.y === player.y) {
     player.reset();
+    star.reset();
   }
 };
 
 Enemy.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+
+
+/* Player */
 
 // Function to create new instances of Player object.
 var Player = function() {
@@ -89,16 +95,19 @@ var Player = function() {
 Player.prototype.update = function() {
   // If player is in 1st row, reset its position to 6th row.
   // Also reset location of rock.
+  // Also add star to top row.
   if (this.y === -20) {
     player.reset();
     rock.reset();
+    star.addStar();
+    console.log("hello from player update");
   }
 };
 
 Player.prototype.handleInput= function(key) {
   // Don't allow player to move off the game board to the right, left, or bottom.
   // Don't allow player to move into square with a rock.
-  // Do allow it to reach the 1st row with water.
+  // Do allow player to reach the 1st row with water.
   // Next update will reset player to 6th row very quickly.
   // Possible x and y positions for player are detailed in comments at top.
 
@@ -137,6 +146,8 @@ Player.prototype.reset = function() {
 };
 
 
+/* Rock */
+
 // Function to create new instances of Rock object. 
 
 var Rock = function() {
@@ -155,6 +166,33 @@ Rock.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+
+/* Star */
+
+// Function to create new instances of Star object.
+
+var Star = function() {
+  this.sprite = 'images/Star.png';
+  this.numStars = 0;
+}
+
+Star.prototype.addStar = function() {
+  this.numStars++;
+};
+
+Star.prototype.render = function() {
+  for (var i = 0; i < this.numStars; i++) {
+    ctx.drawImage(Resources.get(this.sprite), (this.numStars * 101) - 101, 0);
+  }
+};
+
+Star.prototype.reset = function() {
+  this.numStars = 0;
+}
+
+
+/*  Instantiate New Objects */
+
 // Instantiate multiple enemy objects.
 var allEnemies = [];
 for (var i = 0; i < 5; i++) {
@@ -170,6 +208,11 @@ player.reset();
 // Set initial location with reset method.
 var rock = new Rock();
 rock.reset();
+
+// Instantiate one star object.
+// No stars appear til player hits water row for first time.
+var star = new Star();
+
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method.
