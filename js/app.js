@@ -97,6 +97,7 @@ Player.prototype.update = function() {
 
 Player.prototype.handleInput= function(key) {
   // Don't allow player to move off the game board to the right, left, or bottom.
+  // Don't allow player to move into square with a rock.
   // Do allow it to reach the 1st row with water.
   // Next update will reset player to 6th row very quickly.
   // Possible x and y positions for player are detailed in comments at top.
@@ -114,10 +115,6 @@ Player.prototype.handleInput= function(key) {
  if (key === "down" && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
     this.y += 83;
  }
-  console.log("this.x is " + this.x);
-  console.log("this.y is " + this.y);
-  console.log("rock.x is " + rock.x);
-  console.log("rock.y is " + rock.y);
 };
 
 Player.prototype.render = function() {
@@ -128,6 +125,15 @@ Player.prototype.render = function() {
 Player.prototype.reset = function() {
   this.x = 202;
   this.y = 395;
+  var charArr = [ 
+    'images/char-boy.png',
+    'images/char-cat-girl.png',
+    'images/char-horn-girl.png',
+    'images/char-pink-girl.png',
+    'images/char-princess-girl.png'
+  ];  
+  var charNum = getRandomInt(0, 5); 
+  this.sprite = charArr[charNum];
 };
 
 
@@ -137,10 +143,10 @@ var Rock = function() {
   this.sprite = 'images/Rock.png';
 };
 
-// Reset picks new location for rock.
+// Reset picks new random location for rock.
 Rock.prototype.reset = function() {
-  var colNum = getRandomInt(0, 5); // select column 1 through 5
-  var rowNum = getRandomInt(0, 3); // select row 2 through 4
+  var colNum = getRandomInt(0, 5); // corresponds to column 1 through 5
+  var rowNum = getRandomInt(0, 3); // corresponds to  row 2 through 4
   this.x = colNum * 101;
   this.y = 63 + (rowNum * 83);
 }
@@ -164,7 +170,6 @@ player.reset();
 // Set initial location with reset method.
 var rock = new Rock();
 rock.reset();
-console.log(rock.x, rock.y);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method.
