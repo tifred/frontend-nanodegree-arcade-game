@@ -88,8 +88,10 @@ var Player = function() {
 
 Player.prototype.update = function() {
   // If player is in 1st row, reset its position to 6th row.
+  // Also reset location of rock.
   if (this.y === -20) {
     player.reset();
+    rock.reset();
   }
 };
 
@@ -99,28 +101,52 @@ Player.prototype.handleInput= function(key) {
   // Next update will reset player to 6th row very quickly.
   // Possible x and y positions for player are detailed in comments at top.
 
-  if (key === "left" && this.x !== 0) {
-    this.x -= 101;
+
+  if (key === "left" && this.x !== 0 && !(rock.x === this.x - 101 && rock.y === this.y)) {
+       this.x -= 101;
   }
-  if (key === "right" && this.x !== 404) {
+  if (key === "right" && this.x !== 404 && !(rock.x === this.x + 101 && rock.y === this.y)) {
     this.x += 101;
  }
- if (key === "up" && this.y !== -20) {
+ if (key === "up" && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
     this.y -= 83;
  }
- if (key === "down" && this.y !== 395) {
+ if (key === "down" && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
     this.y += 83;
  }
+  console.log("this.x is " + this.x);
+  console.log("this.y is " + this.y);
+  console.log("rock.x is " + rock.x);
+  console.log("rock.y is " + rock.y);
 };
 
 Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Move player back to 6th row and 3rd column.
+// Reset moves player back to 6th row and 3rd column.
 Player.prototype.reset = function() {
   this.x = 202;
   this.y = 395;
+};
+
+
+// Function to create new instances of Rock object. 
+
+var Rock = function() {
+  this.sprite = 'images/Rock.png';
+};
+
+// Reset picks new location for rock.
+Rock.prototype.reset = function() {
+  var colNum = getRandomInt(0, 5); // select column 1 through 5
+  var rowNum = getRandomInt(0, 3); // select row 2 through 4
+  this.x = colNum * 101;
+  this.y = 63 + (rowNum * 83);
+}
+
+Rock.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Instantiate multiple enemy objects.
@@ -133,6 +159,12 @@ for (var i = 0; i < 5; i++) {
 // Set initial location with reset method.
 var player = new Player();
 player.reset();
+
+// Instantiate one rock object.
+// Set initial location with reset method.
+var rock = new Rock();
+rock.reset();
+console.log(rock.x, rock.y);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method.
