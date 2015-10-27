@@ -109,7 +109,6 @@ Player.prototype.update = function() {
     player.reset();
     rock.reset();
     star.addStar();
-    console.log("hello from player update");
   }
 };
 
@@ -130,16 +129,16 @@ Player.prototype.handleInput= function(key) {
   //   b. that the rock is not on the same row as the player,
   // THEN it is safe to move to the column to the left.
 
-  if (key === "left" && this.x !== 0 && !(rock.x === this.x - 101 && rock.y === this.y)) {
+  if (key === 'left' && this.x !== 0 && !(rock.x === this.x - 101 && rock.y === this.y)) {
     this.x -= 101;
   }
-  if (key === "right" && this.x !== 404 && !(rock.x === this.x + 101 && rock.y === this.y)) {
+  if (key === 'right' && this.x !== 404 && !(rock.x === this.x + 101 && rock.y === this.y)) {
     this.x += 101;
   }
-  if (key === "up" && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
+  if (key === 'up' && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
     this.y -= 83;
   }
-  if (key === "down" && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
+  if (key === 'down' && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
     this.y += 83;
   }
 };
