@@ -1,7 +1,9 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-TO RUN GAME: open index.html in browser window.
+TO RUN GAME: 
+
+Open index.html in browser window.
 
 TO PLAY GAME:
 
@@ -21,4 +23,4 @@ Rock will get a different position.
 
 Each time the game is won, the star moves one over to the right.
 If the game is lost, all stars disappear.
-Getting five stars means you have won have games in a row.
+Getting five stars means you have won five games in a row.
