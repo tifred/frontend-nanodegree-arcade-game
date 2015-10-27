@@ -1,4 +1,4 @@
-/* Notes on x and y coordinates for game
+/* General notes on x and y coordinates for game:
 
 Canvas is 505 wide.
 5 columns total, so each column is 101 wide.
@@ -14,14 +14,15 @@ Possible x positions for enemy are: anywhere between -800 and 790.
 Canvas is 606 high.
 6 rows total.
 
-First 5 rows are 83 high; 6th row is the remainder (191).
+First 5 rows are 83 high.
+6th row is the remainder (191 high).
 Player and enemy positions are offset to be
 20 higher than the row, for best visual effect.
 
 Enemies can only be on rows 2, 3, 4.
 Possible y positions for enemy: 63, 146, 229.
 
-Player can only be in rows 2, 3, 4, 5
+Player can only be in rows 2, 3, 4, 5.
 If player hits the 1st row, they reset back to 6th row.
 Possible y positions for player: (-20), 63, 146, 229, 312, 395.
 Note the -20 position will trigger a reset upon next update.
@@ -30,6 +31,7 @@ Note the -20 position will trigger a reset upon next update.
 
 // Helper function to generate random integer.
 // Min is included, max is excluded.
+
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
@@ -39,6 +41,7 @@ function getRandomInt(min, max) {
 
 
 // Function to create new instances of Enemy object.
+
 var Enemy = function() {
 
   this.sprite = 'images/enemy-bug.png';
@@ -61,6 +64,7 @@ var Enemy = function() {
 };
 
 Enemy.prototype.update = function(dt) {
+
   // update x position by enemies speed factor, the dt, and a constant of 150.
   this.x += dt * this.speed * 150;
 
@@ -70,6 +74,7 @@ Enemy.prototype.update = function(dt) {
   }
 
   // if the enemy enters same square as player, reset the player position.
+  // also sets count of stars back to 0.
   if ((this.x >= player.x && this.x <= player.x + 101) && this.y === player.y) {
     player.reset();
     star.reset();
@@ -83,8 +88,11 @@ Enemy.prototype.render = function() {
 
 /* Player */
 
+
 // Function to create new instances of Player object.
+
 var Player = function() {
+
   this.sprite = 'images/char-boy.png';
 
   // Note that player's initial position is set by player.reset() below.
@@ -93,9 +101,10 @@ var Player = function() {
 };
 
 Player.prototype.update = function() {
-  // If player is in 1st row, reset its position to 6th row.
+
+  // If player has reached 1st row, reset its position to 6th row.
   // Also reset location of rock.
-  // Also add star to top row.
+  // Also add star to top row or move it over one position to right.
   if (this.y === -20) {
     player.reset();
     rock.reset();
@@ -105,25 +114,34 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.handleInput= function(key) {
+
   // Don't allow player to move off the game board to the right, left, or bottom.
-  // Don't allow player to move into square with a rock.
+  // Don't allow player to move into a square with a rock.
   // Do allow player to reach the 1st row with water.
   // Next update will reset player to 6th row very quickly.
   // Possible x and y positions for player are detailed in comments at top.
 
+  // Here is the logic of the first if statement, written out as an example:
+
+  // If left key is hit and the player is not in the first column (where x is 0)
+  // and it is NOT true that
+  //   a. the rock is in the column to the left of the player
+  //   AND
+  //   b. that the rock is not on the same row as the player,
+  // THEN it is safe to move to the column to the left.
 
   if (key === "left" && this.x !== 0 && !(rock.x === this.x - 101 && rock.y === this.y)) {
-       this.x -= 101;
+    this.x -= 101;
   }
   if (key === "right" && this.x !== 404 && !(rock.x === this.x + 101 && rock.y === this.y)) {
     this.x += 101;
- }
- if (key === "up" && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
+  }
+  if (key === "up" && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
     this.y -= 83;
- }
- if (key === "down" && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
+  }
+  if (key === "down" && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
     this.y += 83;
- }
+  }
 };
 
 Player.prototype.render = function() {
@@ -131,24 +149,27 @@ Player.prototype.render = function() {
 };
 
 // Reset moves player back to 6th row and 3rd column.
+// Also picks another player icon, at random.
+
 Player.prototype.reset = function() {
   this.x = 202;
   this.y = 395;
-  var charArr = [ 
+  var charArr = [
     'images/char-boy.png',
     'images/char-cat-girl.png',
     'images/char-horn-girl.png',
     'images/char-pink-girl.png',
     'images/char-princess-girl.png'
-  ];  
-  var charNum = getRandomInt(0, 5); 
+  ];
+  var charNum = getRandomInt(0, 5);
   this.sprite = charArr[charNum];
 };
 
 
 /* Rock */
 
-// Function to create new instances of Rock object. 
+
+// Function to create new instances of Rock object.
 
 var Rock = function() {
   this.sprite = 'images/Rock.png';
@@ -156,11 +177,11 @@ var Rock = function() {
 
 // Reset picks new random location for rock.
 Rock.prototype.reset = function() {
-  var colNum = getRandomInt(0, 5); // corresponds to column 1 through 5
-  var rowNum = getRandomInt(0, 3); // corresponds to  row 2 through 4
+  var colNum = getRandomInt(0, 5); // will correspond to column 1 through 5
+  var rowNum = getRandomInt(0, 3); // will correspond to row 2 through 4
   this.x = colNum * 101;
   this.y = 63 + (rowNum * 83);
-}
+};
 
 Rock.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -169,29 +190,30 @@ Rock.prototype.render = function() {
 
 /* Star */
 
+
 // Function to create new instances of Star object.
 
 var Star = function() {
   this.sprite = 'images/Star.png';
   this.numStars = 0;
-}
+};
 
 Star.prototype.addStar = function() {
   this.numStars++;
 };
 
+// First star will be at x = 0, then x = 101, etc..
 Star.prototype.render = function() {
-  for (var i = 0; i < this.numStars; i++) {
-    ctx.drawImage(Resources.get(this.sprite), (this.numStars * 101) - 101, 0);
-  }
+  ctx.drawImage(Resources.get(this.sprite), (this.numStars * 101) - 101, 0);
 };
 
 Star.prototype.reset = function() {
   this.numStars = 0;
-}
+};
 
 
 /*  Instantiate New Objects */
+
 
 // Instantiate multiple enemy objects.
 var allEnemies = [];
@@ -210,7 +232,7 @@ var rock = new Rock();
 rock.reset();
 
 // Instantiate one star object.
-// No stars appear til player hits water row for first time.
+// No stars appear til player hits top row for first time.
 var star = new Star();
 
 
