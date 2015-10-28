@@ -36,6 +36,14 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+// Define Constants.
+
+var COL_X = 101;       // width of each column.
+var ROW_Y = 83;        // height of each column (6th row is longer, but that's not relevant).
+var SPEED_MUL = 150;   // constant by which to increase speed of game.
+var Y_OFFSET = 20;     // number by which all entities will be higher than background rows. 
+var Y_MAX = 800;       // the highest y position for enemies (will be off the canvas).
+
 
 /* Enemy */
 
@@ -49,11 +57,11 @@ var Enemy = function() {
   // enemies will be in row 2, 3, or 4.
   // select one randomly.
   var rowPos = getRandomInt(1, 4);
-  this.y = rowPos * 83 - 20;
+  this.y = rowPos * ROW_Y - Y_OFFSET;
 
   // select a random y position to start
   // make half of them negative.
-  var colPos = getRandomInt(1, 800);
+  var colPos = getRandomInt(1, Y_MAX);
   if (colPos % 2 === 0) {
     colPos *= -1;
   }
@@ -66,16 +74,16 @@ var Enemy = function() {
 Enemy.prototype.update = function(dt) {
 
   // update x position by enemies speed factor, the dt, and a constant of 150.
-  this.x += dt * this.speed * 150;
+  this.x += dt * this.speed * SPEED_MUL;
 
-  // return enemy to start of range if it goes above 790.
-  if (this.x >= 790) {
+  // return enemy to start of range when it gets close to the top of the Y_MAX.
+  if (this.x >= Y_MAX - 10) {
     this.x *= -1;
   }
 
   // if the enemy enters same square as player, reset the player position.
   // also sets count of stars back to 0.
-  if ((this.x >= player.x && this.x <= player.x + 101) && this.y === player.y) {
+  if ((this.x >= player.x && this.x <= player.x + COL_X) && this.y === player.y) {
     player.reset();
     star.reset();
   }
@@ -105,14 +113,14 @@ Player.prototype.update = function() {
   // If player has reached 1st row, reset its position to 6th row.
   // Also reset location of rock.
   // Also add star to top row or move it over one position to right.
-  if (this.y === -20) {
-    player.reset();
+  if (this.y === -Y_OFFSET) {
+    this.reset();
     rock.reset();
     star.addStar();
   }
 };
 
-Player.prototype.handleInput= function(key) {
+Player.prototype.handleInput = function(key) {
 
   // Don't allow player to move off the game board to the right, left, or bottom.
   // Don't allow player to move into a square with a rock.
@@ -129,17 +137,17 @@ Player.prototype.handleInput= function(key) {
   //   b. that the rock is not on the same row as the player,
   // THEN it is safe to move to the column to the left.
 
-  if (key === 'left' && this.x !== 0 && !(rock.x === this.x - 101 && rock.y === this.y)) {
-    this.x -= 101;
+  if (key === 'left' && this.x !== 0 && !(rock.x === this.x - COL_X && rock.y === this.y)) {
+    this.x -= COL_X;
   }
-  if (key === 'right' && this.x !== 404 && !(rock.x === this.x + 101 && rock.y === this.y)) {
-    this.x += 101;
+  if (key === 'right' && this.x !== COL_X * 4 && !(rock.x === this.x + COL_X && rock.y === this.y)) {
+    this.x += COL_X;
   }
-  if (key === 'up' && this.y !== -20 && !(rock.y === this.y - 83 && rock.x === this.x)) {
-    this.y -= 83;
+  if (key === 'up' && this.y !== -Y_OFFSET && !(rock.y === this.y - ROW_Y && rock.x === this.x)) {
+    this.y -= ROW_Y;
   }
-  if (key === 'down' && this.y !== 395 && !(rock.y === this.y + 83 && rock.x === this.x)) {
-    this.y += 83;
+  if (key === 'down' && this.y !== ROW_Y - Y_OFFSET && !(rock.y === this.y + ROW_Y && rock.x === this.x)) {
+    this.y += ROW_Y;
   }
 };
 
@@ -151,8 +159,8 @@ Player.prototype.render = function() {
 // Also picks another player icon, at random.
 
 Player.prototype.reset = function() {
-  this.x = 202;
-  this.y = 395;
+  this.x = COL_X * 2;
+  this.y = ROW_Y * 5 - Y_OFFSET;
   var charArr = [
     'images/char-boy.png',
     'images/char-cat-girl.png',
@@ -178,8 +186,8 @@ var Rock = function() {
 Rock.prototype.reset = function() {
   var colNum = getRandomInt(0, 5); // will correspond to column 1 through 5
   var rowNum = getRandomInt(0, 3); // will correspond to row 2 through 4
-  this.x = colNum * 101;
-  this.y = 63 + (rowNum * 83);
+  this.x = colNum * COL_X;
+  this.y = ROW_Y - Y_OFFSET + (rowNum * ROW_Y);
 };
 
 Rock.prototype.render = function() {
@@ -201,9 +209,9 @@ Star.prototype.addStar = function() {
   this.numStars++;
 };
 
-// First star will be at x = 0, then x = 101, etc..
+// First star will be at x = 0, then x = COL_X), etc..
 Star.prototype.render = function() {
-  ctx.drawImage(Resources.get(this.sprite), (this.numStars * 101) - 101, 0);
+  ctx.drawImage(Resources.get(this.sprite), (this.numStars * COL_X) - COL_X, 0);
 };
 
 Star.prototype.reset = function() {
