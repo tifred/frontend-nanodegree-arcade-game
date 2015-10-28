@@ -41,8 +41,21 @@ function getRandomInt(min, max) {
 var COL_X = 101;       // width of each column.
 var ROW_Y = 83;        // height of each column (6th row is longer, but that's not relevant).
 var SPEED_MUL = 150;   // constant by which to increase speed of game.
-var Y_OFFSET = 20;     // number by which all entities will be higher than background rows. 
+var Y_OFFSET = 20;     // number by which all entities will be higher than background rows.
 var Y_MAX = 800;       // the highest y position for enemies (will be off the canvas).
+
+
+/* Entity */
+
+// This is a super-class.
+//  All entities (e.g. Enemy, Player, Rock, Star) will use the object it returns)
+
+//  I chose not to include the x and y properties here because
+//  they often get reset with random values in the object constructors.
+
+var Entity = function(sprite) {
+  this.sprite = sprite;
+};
 
 
 /* Enemy */
@@ -50,9 +63,9 @@ var Y_MAX = 800;       // the highest y position for enemies (will be off the ca
 
 // Function to create new instances of Enemy object.
 
-var Enemy = function() {
+var Enemy = function(sprite) {
 
-  this.sprite = 'images/enemy-bug.png';
+  Entity.call(this, sprite);
 
   // enemies will be in row 2, 3, or 4.
   // select one randomly.
@@ -70,6 +83,9 @@ var Enemy = function() {
   // select random speed multiplier: 1, 2, 3, or 4.
   this.speed = getRandomInt(1, 5);
 };
+Enemy.prototype = Object.create(Entity.prototype);
+Enemy.prototype.constructor = Enemy;
+
 
 Enemy.prototype.update = function(dt) {
 
@@ -99,14 +115,16 @@ Enemy.prototype.render = function() {
 
 // Function to create new instances of Player object.
 
-var Player = function() {
+var Player = function(sprite) {
 
-  this.sprite = 'images/char-boy.png';
+  Entity.call(this, sprite);
 
   // Note that player's initial position is set by player.reset() below.
   // This happens immediately after instantiation.
   // This keeps initial positioning values in one single location.
 };
+Player.prototype = Object.create(Entity.prototype);
+Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
 
@@ -178,9 +196,11 @@ Player.prototype.reset = function() {
 
 // Function to create new instances of Rock object.
 
-var Rock = function() {
-  this.sprite = 'images/Rock.png';
+var Rock = function(sprite) {
+  Entity.call(this, sprite);
 };
+Rock.prototype = Object.create(Entity.prototype);
+Rock.prototype.constructor = Rock;
 
 // Reset picks new random location for rock.
 Rock.prototype.reset = function() {
@@ -200,10 +220,12 @@ Rock.prototype.render = function() {
 
 // Function to create new instances of Star object.
 
-var Star = function() {
-  this.sprite = 'images/Star.png';
+var Star = function(sprite) {
+  Entity.call(this, sprite);
   this.numStars = 0;
 };
+Star.prototype = Object.create(Entity.prototype);
+Star.prototype.constructor = Star;
 
 Star.prototype.addStar = function() {
   this.numStars++;
@@ -225,22 +247,22 @@ Star.prototype.reset = function() {
 // Instantiate multiple enemy objects.
 var allEnemies = [];
 for (var i = 0; i < 5; i++) {
-  allEnemies.push(new Enemy());
+  allEnemies.push(new Enemy('images/enemy-bug.png'));
 }
 
 // Instantiate one player object.
 // Set initial location with reset method.
-var player = new Player();
+var player = new Player('images/char-boy.png');
 player.reset();
 
 // Instantiate one rock object.
 // Set initial location with reset method.
-var rock = new Rock();
+var rock = new Rock('images/Rock.png');
 rock.reset();
 
 // Instantiate one star object.
 // No stars appear til player hits top row for first time.
-var star = new Star();
+var star = new Star('images/Star.png');
 
 
 // This listens for key presses and sends the keys to your
