@@ -40,7 +40,7 @@ function getRandomInt(min, max) {
 
 var COL_X = 101;       // width of each column.
 var ROW_Y = 83;        // height of each column (6th row is longer, but that's not relevant).
-var SPEED_MUL = 150;   // constant by which to increase speed of game.
+var SPEED_MUL = 150;   // constant by which to increase speed of game engine.
 var Y_OFFSET = 20;     // number by which all entities will be higher than background rows.
 var Y_MAX = 800;       // the highest y position for enemies (will be off the canvas).
 
